@@ -11,7 +11,7 @@ export default function Login() {
       alert("Fill all fields");
       return;
     }
-    
+
       const res = await fetch("http://localhost:5200/api/users/login", {
         method: "POST",
         headers: {
