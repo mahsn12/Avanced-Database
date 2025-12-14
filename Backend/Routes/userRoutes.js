@@ -1,16 +1,16 @@
 import express from "express";
 
 import {
-  registerUser,
-  loginUser,
-  enrollInCourse,
-  getMyCourses,
-  followThread,
-  unfollowThread,
-  updateUserProfile
-} from "../controllers/user.controller.js";
+    registerUser,
+    loginUser,
+    enrollInCourse,
+    getMyCourses,
+    followThread,
+    unfollowThread,
+    updateUserProfile
+} from "../Controllers/UserController.js";
 
-import { protect } from "../middleware/auth.middleware.js";
+import { protect } from "../MiddleWare/auth.js";
 
 const router = express.Router();
 
