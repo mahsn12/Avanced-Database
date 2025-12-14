@@ -1,14 +1,45 @@
 import mongoose from "mongoose";
 
 const QuestionSchema = new mongoose.Schema({
-  threadID: { type: mongoose.Schema.Types.ObjectId, ref: "Thread" },
-  courseID: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
-  authorID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  content: String,
-  tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
-  bestAnswerID: { type: mongoose.Schema.Types.ObjectId, ref: "Reply" },
-  status: { type: String, default: "open" },
-  createdAt: { type: Date, default: Date.now }
+    _id: {
+        type: String, // "Q5001"
+        required: true,
+    },
+    threadId: {
+        type: String, // "T4001"
+        required: true,
+    },
+    courseId: {
+        type: String, // "C200"
+        required: true,
+    },
+    authorId: {
+        type: String, // "U1001"
+        required: true,
+    },
+    content: {
+        type: String,
+        required: true,
+    },
+    tags: {
+        type: [String], // ["TAG5001"]
+        default: [],
+    },
+    bestAnswerId: {
+        type: String, // "R6001"
+        default: null,
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+    },
+}, {
+    timestamps: {
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+    },
+    versionKey: false,
 });
 
-export default mongoose.model("Question", QuestionSchema);
+export default mongoose.model("questions", QuestionSchema);

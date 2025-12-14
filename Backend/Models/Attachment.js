@@ -1,12 +1,36 @@
 import mongoose from "mongoose";
 
 const AttachmentSchema = new mongoose.Schema({
-  ownerID: mongoose.Schema.Types.ObjectId,
-  filename: String,
-  url: String,
-  mime: String,
-  size: Number,
-  createdAt: { type: Date, default: Date.now }
+    _id: {
+        type: String, // "A9001"
+        required: true,
+    },
+    ownerId: {
+        type: String, // "U1003"
+        required: true,
+    },
+    filename: {
+        type: String,
+        required: true,
+    },
+    url: {
+        type: String,
+        required: true,
+    },
+    mime: {
+        type: String,
+        required: true,
+    },
+    size: {
+        type: Number,
+        required: true,
+    },
+}, {
+    timestamps: {
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+    },
+    versionKey: false,
 });
 
-export default mongoose.model("Attachment", AttachmentSchema);
+export default mongoose.model("attachments", AttachmentSchema);

@@ -1,13 +1,41 @@
 import mongoose from "mongoose";
 
 const PostSchema = new mongoose.Schema({
-  courseID: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
-  userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  title: String,
-  content: String,
-  attachments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],
-  status: { type: String, default: "active" },
-  createdAt: { type: Date, default: Date.now }
+    _id: {
+        type: String, // "P7001"
+        required: true,
+    },
+    courseId: {
+        type: String, // "C200"
+        required: true,
+    },
+    userId: {
+        type: String, // "U1003"
+        required: true,
+    },
+    title: {
+        type: String,
+        required: true,
+    },
+    content: {
+        type: String,
+        required: true,
+    },
+    attachments: {
+        type: [String], // ["A9001"]
+        default: [],
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+    },
+}, {
+    timestamps: {
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+    },
+    versionKey: false,
 });
 
-export default mongoose.model("Post", PostSchema);
+export default mongoose.model("posts", PostSchema);

@@ -1,14 +1,32 @@
 import mongoose from "mongoose";
 
 const ThreadSubscriptionSchema = new mongoose.Schema({
-  userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  threadID: { type: mongoose.Schema.Types.ObjectId, ref: "Thread" },
-  createdAt: { type: Date, default: Date.now }
+    _id: {
+        type: String, // "TS13001"
+        required: true,
+    },
+    userId: {
+        type: String, // "U1001"
+        required: true,
+    },
+    threadId: {
+        type: String, // "T4001"
+        required: true,
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+    },
+}, {
+    timestamps: {
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+    },
+    versionKey: false,
 });
 
-ThreadSubscriptionSchema.index(
-  { userID: 1, threadID: 1 },
-  { unique: true }
-);
+// Prevent duplicate subscriptions
+ThreadSubscriptionSchema.index({ userId: 1, threadId: 1 }, { unique: true });
 
-export default mongoose.model("ThreadSubscription", ThreadSubscriptionSchema);
+export default mongoose.model("thread_subscriptions", ThreadSubscriptionSchema);

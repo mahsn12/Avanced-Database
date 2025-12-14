@@ -1,12 +1,45 @@
 import mongoose from "mongoose";
 
 const ReplySchema = new mongoose.Schema({
-  questionID: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
-  authorID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  content: String,
-  upvotes: { type: Number, default: 0 },
-  isBest: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+    _id: {
+        type: String, // "R6001"
+        required: true,
+    },
+    questionId: {
+        type: String, // "Q5001"
+        required: true,
+    },
+    threadId: {
+        type: String, // "T4001"
+        required: true,
+    },
+    authorId: {
+        type: String, // "U1003"
+        required: true,
+    },
+    content: {
+        type: String,
+        required: true,
+    },
+    upvotes: {
+        type: Number,
+        default: 0,
+    },
+    isBest: {
+        type: Boolean,
+        default: false,
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+    },
+}, {
+    timestamps: {
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+    },
+    versionKey: false,
 });
 
-export default mongoose.model("Reply", ReplySchema);
+export default mongoose.model("replies", ReplySchema);

@@ -1,11 +1,31 @@
 import mongoose from "mongoose";
 
 const ActivityLogSchema = new mongoose.Schema({
-  userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  actionType: String,
-  targetID: mongoose.Schema.Types.ObjectId,
-  detail: String,
-  timestamp: { type: Date, default: Date.now }
+    _id: {
+        type: String, // "AL12001"
+        required: true,
+    },
+    userId: {
+        type: String, // "U1001"
+        required: true,
+    },
+    actionType: {
+        type: String, // "posted_question", "replied", etc.
+        required: true,
+    },
+    targetId: {
+        type: String, // "Q5001", "R6001", etc.
+        required: true,
+    },
+    detail: {
+        type: String,
+    },
+}, {
+    timestamps: {
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+    },
+    versionKey: false,
 });
 
-export default mongoose.model("ActivityLog", ActivityLogSchema);
+export default mongoose.model("activity_logs", ActivityLogSchema);
