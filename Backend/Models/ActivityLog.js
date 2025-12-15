@@ -28,4 +28,5 @@ const ActivityLogSchema = new mongoose.Schema({
     versionKey: false,
 });
 
-export default mongoose.model("activity_logs", ActivityLogSchema);
+export default mongoose.models.activity_logs ||
+  mongoose.model("activity_logs", ActivityLogSchema);

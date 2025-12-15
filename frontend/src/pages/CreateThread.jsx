@@ -15,17 +15,20 @@ export default function CreateThread() {
       return;
     }
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("You must be logged in");
+      return;
+    }
+
     setLoading(true);
 
     const body = {
-      title,
-      courseID,
-      tags: tags
-        ? tags.split(",").map(t => t.trim())
-        : [],
-
-      // ⚠️ TEMPORARY (backend SHOULD use req.user.id instead)
-      creatorID: localStorage.getItem("userId")
+      _id: `T-${Date.now()}`,      // required by schema
+      courseId: courseID,          // required by schema
+      title,                       // required by schema
+      creatorId: user._id,         // ✅ FIXED (from user object)
+      tags: tags ? tags.split(",").map(t => t.trim()) : [],
     };
 
     try {
@@ -33,9 +36,9 @@ export default function CreateThread() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -45,8 +48,8 @@ export default function CreateThread() {
 
       const thread = await res.json();
 
-      // redirect to course threads
-      navigate(`/threads/${thread.courseID}`);
+      // redirect to threads of the selected course
+      navigate(`/threads/${thread.courseId}`);
     } catch (err) {
       alert(err.message);
     } finally {
@@ -70,9 +73,7 @@ export default function CreateThread() {
         onChange={e => setTitle(e.target.value)}
       />
 
-      <textarea
-        placeholder="Short description (optional)"
-      />
+      <textarea placeholder="Short description (optional)" />
 
       <input
         placeholder="Tags (e.g. MongoDB, Database Design)"
