@@ -1,21 +1,14 @@
 import express from "express";
 import {
+  createReply,
   getRepliesByQuestion,
-  createReply
-} from "../Controllers/ReplyController.js"; // ✅ FIXED CASE
+  toggleBestReply,
+} from "../Controllers/ReplyController.js";
 
 const router = express.Router();
 
-/**
- * Get replies by question
- * GET /api/replies/question/:questionId
- */
-router.get("/question/:questionId", getRepliesByQuestion);
-
-/**
- * Create reply (student / instructor)
- * POST /api/replies
- */
 router.post("/", createReply);
+router.get("/question/:questionId", getRepliesByQuestion);
+router.patch("/best", toggleBestReply);
 
 export default router;

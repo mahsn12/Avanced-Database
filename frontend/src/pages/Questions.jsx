@@ -12,20 +12,20 @@ const Questions = () => {
 
   const [questions, setQuestions] = useState([]);
   const [content, setContent] = useState("");
-  const [repliesMap, setRepliesMap] = useState({}); // questionId → replies[]
+  const [repliesMap, setRepliesMap] = useState({});
 
   /* ======================
-     LOAD QUESTIONS
+     LOAD QUESTIONS + REPLIES
      ====================== */
   const loadQuestions = async () => {
-    const data = await getQuestionsByThread(threadId);
-    setQuestions(data);
+    const qs = await getQuestionsByThread(threadId);
+    setQuestions(qs);
 
-    const repliesData = {};
-    for (const q of data) {
-      repliesData[q._id] = await getRepliesByQuestion(q._id);
+    const map = {};
+    for (const q of qs) {
+      map[q._id] = await getRepliesByQuestion(q._id);
     }
-    setRepliesMap(repliesData);
+    setRepliesMap(map);
   };
 
   useEffect(() => {
@@ -64,25 +64,28 @@ const Questions = () => {
      REPORT REPLY
      ====================== */
   const reportReply = async (replyId) => {
-    if (!user) {
-      alert("You must be logged in");
-      return;
-    }
+    const reason = prompt("Enter report reason:");
+    if (!reason) return;
 
-    try {
-      await API.post("/api/reports", {
-  reporterId: user._id,        // ✅ ADD THIS
-  targetId: replyId,
-  targetType: "reply",
-  reason: "Inappropriate content",
-});
+    await API.post("/api/reports", {
+      reporterId: user._id,
+      targetId: replyId,
+      targetType: "reply",
+      reason,
+    });
 
+    alert("Reply reported");
+  };
 
-      alert("Reply reported successfully");
-    } catch (err) {
-      alert("Failed to report reply");
-      console.error(err);
-    }
+  /* ======================
+     TOGGLE BEST ANSWER
+     ====================== */
+  const toggleBest = async (replyId, questionId) => {
+    await API.patch("/api/replies/best", {
+      replyId,
+      questionId,
+    });
+    loadQuestions();
   };
 
   return (
@@ -108,30 +111,44 @@ const Questions = () => {
         {questions.map((q) => (
           <div key={q._id} className="list-item">
             <strong>{q.content}</strong>
-            <p className="meta">Author: {q.authorId}</p>
+            <p className="meta">Asked by: {q.authorId}</p>
 
-            {/* SHOW REPLIES */}
+            {/* REPLIES */}
             {repliesMap[q._id]?.map((r) => (
               <div
                 key={r._id}
                 className={`reply ${r.isBest ? "best" : ""}`}
               >
                 <p>{r.content}</p>
-                <span className="meta">
-                  Answered by: {r.authorId}
-                </span>
+                <span className="meta">By: {r.authorId}</span>
 
-                {/* ✅ REPORT BUTTON */}
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => reportReply(r._id)}
-                >
-                  Report
-                </button>
+                {/* INSTRUCTOR: MARK / REMOVE BEST */}
+                {user?.role === "instructor" && (
+                  <button
+                    className="btn btn-warning btn-sm"
+                    onClick={() => toggleBest(r._id, q._id)}
+                  >
+                    {r.isBest ? "Remove Best" : "Mark Best"}
+                  </button>
+                )}
+
+                {/* STUDENT: REPORT */}
+                {user?.role === "student" && (
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => reportReply(r._id)}
+                  >
+                    Report
+                  </button>
+                )}
+
+                {r.isBest && (
+                  <span className="best-badge">✔ Best Answer</span>
+                )}
               </div>
             ))}
 
-            {/* BOTH STUDENT & INSTRUCTOR CAN REPLY */}
+            {/* REPLY BOX (STUDENT + INSTRUCTOR) */}
             {user && (
               <Reply
                 questionId={q._id}
