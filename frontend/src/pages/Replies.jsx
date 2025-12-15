@@ -6,7 +6,8 @@ import "../styles/app.css";
 
 const Replies = () => {
   const { questionId } = useParams();
-  const user = JSON.parse(localStorage.getItem("user"));
+ const user = JSON.parse(localStorage.getItem("user") || "null");
+
 
   const [replies, setReplies] = useState([]);
   const [content, setContent] = useState("");

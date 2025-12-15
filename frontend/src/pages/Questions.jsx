@@ -6,7 +6,7 @@ import "../styles/app.css";
 
 const Questions = () => {
   const { threadId } = useParams();
-  const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const [questions, setQuestions] = useState([]);
   const [content, setContent] = useState("");

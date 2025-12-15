@@ -6,7 +6,7 @@ import "../styles/app.css";
 
 const Threads = () => {
   const { courseId } = useParams();
-  const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const [threads, setThreads] = useState([]);
 

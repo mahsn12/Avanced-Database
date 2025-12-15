@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import API from "../services/api";
 import "../styles/app.css";
@@ -7,12 +7,18 @@ import "../styles/app.css";
 const Home = () => {
   const navigate = useNavigate();
 
+  const rawUser = localStorage.getItem("user");
+  const user = rawUser ? JSON.parse(rawUser) : null;
+
+  // 🔐 HARD GUARD (prevents white screen)
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   const [allCourses, setAllCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const user = JSON.parse(localStorage.getItem("user"));
 
   /* =========================
      FETCH COURSES + ENROLLMENTS
@@ -83,7 +89,7 @@ const Home = () => {
       <Navbar />
 
       <div className="home-page">
-        {/* ============ ENROLLED COURSES ============ */}
+        {/* ENROLLED COURSES */}
         <div className="home-section">
           <h2 className="section-title">My Enrolled Courses</h2>
 
@@ -92,10 +98,7 @@ const Home = () => {
           ) : (
             <div className="course-grid">
               {enrolledCourses.map(course => (
-                <div
-                  key={course._id}
-                  className="course-card enrolled"
-                >
+                <div key={course._id} className="course-card enrolled">
                   <div>
                     <h3>{course.title}</h3>
                     <p>{course.description}</p>
@@ -123,7 +126,7 @@ const Home = () => {
           )}
         </div>
 
-        {/* ============ EXPLORE COURSES ============ */}
+        {/* EXPLORE COURSES */}
         <div className="home-section">
           <h2 className="section-title">Explore Courses</h2>
 
@@ -140,10 +143,7 @@ const Home = () => {
           ) : (
             <div className="course-grid">
               {filteredExplore.map(course => (
-                <div
-                  key={course._id}
-                  className="course-card explore"
-                >
+                <div key={course._id} className="course-card explore">
                   <div>
                     <h3>{course.title}</h3>
                     <p>{course.description}</p>

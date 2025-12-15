@@ -11,9 +11,10 @@ export const ProtectedRoute = ({ children }) => {
 };
 
 export const RoleRoute = ({ children, role }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const rawUser = localStorage.getItem("user");
+  const user = rawUser ? JSON.parse(rawUser) : null;
 
-  if (!user) {
+  if (!user || !user.role) {
     return <Navigate to="/login" replace />;
   }
 
