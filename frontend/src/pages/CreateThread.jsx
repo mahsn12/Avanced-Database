@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../components/Navbar";
-
+import InstructorNavbar from "../components/InstructorNavbar.jsx"
 export default function CreateThread() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,7 +64,7 @@ export default function CreateThread() {
 
   return (
     <>
-      <Navbar />
+      <InstructorNavbar />
 
       <div className="create-thread-page">
         <div className="create-thread-card">

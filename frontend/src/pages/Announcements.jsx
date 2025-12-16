@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import InstructorNavbar from "../components/InstructorNavbar.jsx"
 
 export default function Announcements() {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ export default function Announcements() {
 
   return (
     <>
-      <Navbar />
+      <InstructorNavbar />
 
       <div className="announcement-page">
         <div className="announcement-card">

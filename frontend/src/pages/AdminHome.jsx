@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import API from "../services/api";
 import Navbar from "../components/Navbar";
+import InstructorNavbar from "../components/InstructorNavbar.jsx"
 
 const AdminHome = () => {
   /* ======================

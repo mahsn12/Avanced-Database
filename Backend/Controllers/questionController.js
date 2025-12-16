@@ -9,7 +9,7 @@ import ActivityLog from "../Models/ActivityLog.js";
 ====================================================== */
 export const createQuestion = async (req, res) => {
   try {
-    const { _id, threadId, courseId, authorId, content, tags } = req.body;
+  const { _id, threadId, courseId, authorId, content, tags, attachments } = req.body;
 
     if (!_id || !threadId || !courseId || !authorId || !content) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -28,6 +28,7 @@ export const createQuestion = async (req, res) => {
       authorId,
       content,
       tags: tags || [],
+      attachments: attachments || [],
       status: "active",
     });
 
@@ -61,7 +62,9 @@ export const getQuestionsByThread = async (req, res) => {
     const questions = await Question.find({
       threadId,
       status: "active",
-    }).sort({ createdAt: -1 });
+    })
+      .populate("attachments") 
+      .sort({ createdAt: -1 });
 
     res.status(200).json(questions);
   } catch (err) {
@@ -79,7 +82,9 @@ export const getQuestionsByCourse = async (req, res) => {
     const questions = await Question.find({
       courseId,
       status: "active",
-    }).sort({ createdAt: -1 });
+    })
+      .populate("attachments")
+      .sort({ createdAt: -1 });
 
     res.status(200).json(questions);
   } catch (err) {
