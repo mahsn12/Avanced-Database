@@ -72,12 +72,7 @@ const Threads = () => {
               </div>
 
               <div className="thread-card-actions">
-                <button
-                  className="btn primary"
-                  onClick={() => handleSubscribe(thread._id)}
-                >
-                  Subscribe
-                </button>
+                <br/><br/>
               </div>
             </div>
           ))}

@@ -7,6 +7,8 @@ const Replies = ({ questionId }) => {
 
   const [replies, setReplies] = useState([]);
   const [content, setContent] = useState("");
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   /* ======================
      LOAD REPLIES
@@ -21,21 +23,50 @@ const Replies = ({ questionId }) => {
   }, [questionId]);
 
   /* ======================
-     POST REPLY
+     POST REPLY (WITH ATTACHMENT)
   ====================== */
   const post = async (e) => {
     e.preventDefault();
     if (!user || !content.trim()) return;
 
-    await API.post("/api/replies", {
-      _id: `R-${Date.now()}`,
-      questionId,
-      authorId: user._id,
-      content,
-    });
+    try {
+      setLoading(true);
 
-    setContent("");
-    load();
+      let attachmentIds = [];
+
+      // 🔹 upload attachment first
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("ownerId", user._id);
+
+        const uploadRes = await API.post(
+          "/api/attachments/upload",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        attachmentIds.push(uploadRes.data._id);
+      }
+
+      // 🔹 create reply
+      await API.post("/api/replies", {
+        _id: `R-${Date.now()}`,
+        questionId,
+        authorId: user._id,
+        content,
+        attachments: attachmentIds,
+      });
+
+      setContent("");
+      setFile(null);
+      load();
+    } catch (err) {
+      console.error("POST REPLY ERROR:", err.response?.data || err);
+      alert("Failed to post reply");
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ======================
@@ -58,7 +89,6 @@ const Replies = ({ questionId }) => {
 
   /* ======================
      MARK / UNMARK BEST
-     (INSTRUCTOR + ADMIN)
   ====================== */
   const toggleBest = async (replyId) => {
     await API.patch("/api/replies/best", {
@@ -99,8 +129,20 @@ const Replies = ({ questionId }) => {
             placeholder="Write a reply..."
             required
           />
+
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+
           <div className="form-actions">
-            <button className="btn primary">Reply</button>
+            <button
+              className="btn primary"
+              disabled={loading}
+            >
+              {loading ? "Posting..." : "Reply"}
+            </button>
           </div>
         </form>
       )}
@@ -113,10 +155,36 @@ const Replies = ({ questionId }) => {
             className={`reply-card ${r.isBest ? "best" : ""}`}
           >
             <p className="reply-content">{r.content}</p>
+
+            {/* ATTACHMENTS */}
+            {r.attachments?.length > 0 && (
+              <div className="reply-attachments">
+                {r.attachments.map((att) =>
+                  att.mime.startsWith("image") ? (
+                    <img
+                      key={att._id}
+                      src={att.url}
+                      alt={att.filename}
+                      className="attachment-image"
+                    />
+                  ) : (
+                    <a
+                      key={att._id}
+                      href={att.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="attachment-pdf"
+                    >
+                      📄 {att.filename}
+                    </a>
+                  )
+                )}
+              </div>
+            )}
+
             <p className="reply-meta">By: {r.authorId}</p>
 
             <div className="reply-actions">
-              {/* 👍 LIKE */}
               {user && (
                 <button
                   className="btn small"
@@ -126,7 +194,6 @@ const Replies = ({ questionId }) => {
                 </button>
               )}
 
-              {/* 🚩 REPORT (STUDENT ONLY) */}
               {user?.role === "student" && (
                 <button
                   className="btn danger small"
@@ -136,7 +203,6 @@ const Replies = ({ questionId }) => {
                 </button>
               )}
 
-              {/* ⭐ BEST ANSWER (INSTRUCTOR + ADMIN) */}
               {(user?.role === "instructor" || user?.role === "admin") && (
                 <button
                   className="btn warning small"

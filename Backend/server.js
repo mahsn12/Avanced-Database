@@ -15,6 +15,9 @@ import threadSubscriptionRoutes from "./Routes/threadSubscriptionRoutes.js";
 import announcementRoutes from "./Routes/announcementRoutes.js";
 import reportRoutes from "./Routes/reportRoutes.js";
 import notificationRoutes from "./Routes/notificationRoutes.js";
+import attachmentRoutes from "./Routes/attachmentRoutes.js";
+
+
 
 /* ADMIN */
 import adminRoutes from "./Routes/adminRoutes.js";
@@ -54,6 +57,10 @@ app.use("/api/notifications", notificationRoutes);
 /* ADMIN ROUTES */
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/courses", adminCourseRoutes);
+
+
+app.use("/api/attachments", attachmentRoutes);
+app.use("/uploads", express.static("uploads"));
 
 /* ======================
    START SERVER

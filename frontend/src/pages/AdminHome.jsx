@@ -2,10 +2,20 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import API from "../services/api";
 import Navbar from "../components/Navbar";
+import InstructorNavbar from "../components/InstructorNavbar.jsx"
 
 const AdminHome = () => {
-  const rawUser = localStorage.getItem("user");
-  const user = rawUser ? JSON.parse(rawUser) : null;
+  /* ======================
+     AUTH STATE
+  ====================== */
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  useEffect(() => {
+    const rawUser = localStorage.getItem("user");
+    setUser(rawUser ? JSON.parse(rawUser) : null);
+    setLoadingUser(false);
+  }, []);
 
   /* ======================
      STATE
@@ -15,7 +25,7 @@ const AdminHome = () => {
   const [threads, setThreads] = useState([]);
   const [reports, setReports] = useState([]);
 
-  /* 🔹 NEW: CREATE COURSE STATE */
+  /* 🔹 CREATE COURSE STATE */
   const [newCourse, setNewCourse] = useState({
     _id: "",
     title: "",
@@ -29,28 +39,37 @@ const AdminHome = () => {
      LOAD ADMIN DATA
   ====================== */
   useEffect(() => {
+    if (loadingUser) return;
     if (!user || user.role !== "admin") return;
 
-    API.get("/api/admin/users")
-      .then(res => setUsers(res.data || []))
-      .catch(() => setUsers([]));
+    const loadData = async () => {
+      try {
+        const [u, c, t, r] = await Promise.all([
+          API.get("/api/admin/users"),
+          API.get("/api/admin/courses"),
+          API.get("/api/admin/threads"),
+          API.get("/api/reports"),
+        ]);
 
-    API.get("/api/admin/courses")
-      .then(res => setCourses(res.data || []))
-      .catch(() => setCourses([]));
+        setUsers(u.data || []);
+        setCourses(c.data || []);
+        setThreads(t.data || []);
+        setReports(r.data || []);
+      } catch (err) {
+        console.error("Admin load error:", err);
+      }
+    };
 
-    API.get("/api/admin/threads")
-      .then(res => setThreads(res.data || []))
-      .catch(() => setThreads([]));
-
-    API.get("/api/reports")
-      .then(res => setReports(res.data || []))
-      .catch(() => setReports([]));
-  }, [user]);
+    loadData();
+  }, [loadingUser, user?.role]);
 
   /* ======================
      AUTH GUARD
   ====================== */
+  if (loadingUser) {
+    return <div>Loading...</div>;
+  }
+
   if (!user || user.role !== "admin") {
     return <Navigate to="/login" replace />;
   }
@@ -59,16 +78,9 @@ const AdminHome = () => {
      USER ACTIONS
   ====================== */
   const toggleUserStatus = async (id, status) => {
-    const resolveReport = async (id) => {
-  await API.patch(`/api/reports/${id}/resolve`);
-
-  setReports(prev =>
-    prev.map(r =>
-      r._id === id ? { ...r, status: "resolved" } : r
-    )
-  );
-};
-
+    await API.patch(`/api/admin/users/${id}`, {
+      status: status === "active" ? "inactive" : "active",
+    });
 
     setUsers(prev =>
       prev.map(u =>
@@ -127,7 +139,9 @@ const AdminHome = () => {
     );
   };
 
-  /* 🔹 NEW: CREATE COURSE */
+  /* ======================
+     CREATE COURSE
+  ====================== */
   const createCourse = async () => {
     if (
       !newCourse._id ||
@@ -159,10 +173,8 @@ const AdminHome = () => {
     });
   };
 
-  /* 🔹 NEW: DELETE COURSE */
   const deleteCourse = async (courseId) => {
     if (!window.confirm("Delete this course permanently?")) return;
-
     await API.delete(`/api/admin/courses/${courseId}`);
     setCourses(prev => prev.filter(c => c._id !== courseId));
   };
@@ -170,17 +182,19 @@ const AdminHome = () => {
   /* ======================
      REPORT ACTIONS
   ====================== */
-const resolveReport = async (id) => {
-  await API.patch(`/api/reports/${id}/resolve`);
+  const resolveReport = async (id) => {
+    await API.patch(`/api/reports/${id}/resolve`);
 
-  setReports(prev =>
-    prev.map(r =>
-      r._id === id ? { ...r, status: "resolved" } : r
-    )
-  );
-};
+    setReports(prev =>
+      prev.map(r =>
+        r._id === id ? { ...r, status: "resolved" } : r
+      )
+    );
+  };
 
-
+  /* ======================
+     RENDER
+  ====================== */
   return (
     <>
       <Navbar />
@@ -188,7 +202,7 @@ const resolveReport = async (id) => {
       <div className="page-container">
         <h2 className="section-title">Admin Dashboard</h2>
 
-        {/* ================= CREATE COURSE (NEW) ================= */}
+        {/* ================= CREATE COURSE ================= */}
         <section className="admin-section">
           <h3>Create New Course</h3>
 
@@ -196,49 +210,35 @@ const resolveReport = async (id) => {
             <input
               placeholder="Course ID (C300)"
               value={newCourse._id}
-              onChange={e =>
-                setNewCourse({ ...newCourse, _id: e.target.value })
-              }
+              onChange={e => setNewCourse({ ...newCourse, _id: e.target.value })}
             />
             <input
               placeholder="Title"
               value={newCourse.title}
-              onChange={e =>
-                setNewCourse({ ...newCourse, title: e.target.value })
-              }
+              onChange={e => setNewCourse({ ...newCourse, title: e.target.value })}
             />
             <input
               placeholder="Code"
               value={newCourse.code}
-              onChange={e =>
-                setNewCourse({ ...newCourse, code: e.target.value })
-              }
+              onChange={e => setNewCourse({ ...newCourse, code: e.target.value })}
             />
             <input
               placeholder="Term"
               value={newCourse.term}
-              onChange={e =>
-                setNewCourse({ ...newCourse, term: e.target.value })
-              }
+              onChange={e => setNewCourse({ ...newCourse, term: e.target.value })}
             />
             <input
               placeholder="Instructor IDs (comma separated)"
               value={newCourse.instructorIds}
               onChange={e =>
-                setNewCourse({
-                  ...newCourse,
-                  instructorIds: e.target.value,
-                })
+                setNewCourse({ ...newCourse, instructorIds: e.target.value })
               }
             />
             <textarea
               placeholder="Description"
               value={newCourse.description}
               onChange={e =>
-                setNewCourse({
-                  ...newCourse,
-                  description: e.target.value,
-                })
+                setNewCourse({ ...newCourse, description: e.target.value })
               }
             />
 
@@ -257,7 +257,10 @@ const resolveReport = async (id) => {
                 <strong>{u.name}</strong>
                 <p>{u.email}</p>
                 <p>Role: {u.role}</p>
-                <p>Status: <span className={`status ${u.status}`}>{u.status}</span></p>
+                <p>
+                  Status:{" "}
+                  <span className={`status ${u.status}`}>{u.status}</span>
+                </p>
 
                 <div className="card-actions">
                   <button
@@ -295,15 +298,22 @@ const resolveReport = async (id) => {
                   <p>Code: {c.code}</p>
                   <p>Term: {c.term}</p>
                   <p>Students: {c.totalStudents ?? 0}</p>
-                  <p>Status: <span className={`status ${c.status}`}>{c.status}</span></p>
+                  <p>
+                    Status:{" "}
+                    <span className={`status ${c.status}`}>{c.status}</span>
+                  </p>
 
                   <p>Instructors:</p>
-                  {instructors.length === 0 && <p className="empty-text">None</p>}
+                  {instructors.length === 0 && (
+                    <p className="empty-text">None</p>
+                  )}
 
                   {instructors.map(id => (
                     <div key={id} className="chip">
                       {id}
-                      <button onClick={() => removeInstructor(c._id, id)}>✕</button>
+                      <button onClick={() => removeInstructor(c._id, id)}>
+                        ✕
+                      </button>
                     </div>
                   ))}
 
@@ -343,7 +353,10 @@ const resolveReport = async (id) => {
               <div key={t._id} className="admin-card">
                 <strong>{t.title}</strong>
                 <p>Course: {t.courseId}</p>
-                <p>Status: <span className={`status ${t.status}`}>{t.status}</span></p>
+                <p>
+                  Status:{" "}
+                  <span className={`status ${t.status}`}>{t.status}</span>
+                </p>
               </div>
             ))}
           </div>
@@ -357,7 +370,10 @@ const resolveReport = async (id) => {
               <div key={r._id} className="admin-card">
                 <p><strong>{r.targetType}</strong></p>
                 <p>{r.reason}</p>
-                <p>Status: <span className={`status ${r.status}`}>{r.status}</span></p>
+                <p>
+                  Status:{" "}
+                  <span className={`status ${r.status}`}>{r.status}</span>
+                </p>
 
                 {r.status === "pending" && (
                   <button

@@ -25,6 +25,13 @@ const QuestionSchema = new mongoose.Schema({
         type: [String], // ["TAG5001"]
         default: [],
     },
+
+  attachments: [
+    {
+      type: String,
+      ref: "attachments",
+    },
+  ],
     bestAnswerId: {
         type: String, // "R6001"
         default: null,
