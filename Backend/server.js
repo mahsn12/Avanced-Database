@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import Database from "./Config/db.js";
+import Database from "./config/db.js";
 
 /* AUTH & CORE */
 import authRoutes from "./Routes/authRoutes.js";
@@ -17,8 +17,6 @@ import reportRoutes from "./Routes/reportRoutes.js";
 import notificationRoutes from "./Routes/notificationRoutes.js";
 import attachmentRoutes from "./Routes/attachmentRoutes.js";
 
-
-
 /* ADMIN */
 import adminRoutes from "./Routes/adminRoutes.js";
 import adminCourseRoutes from "./Routes/adminCourseRoutes.js";
@@ -30,7 +28,12 @@ const app = express();
 ====================== */
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:5174"],
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:5174",
+            // add your Vercel frontend URL later
+            // "https://your-frontend.vercel.app"
+        ],
         credentials: true,
     })
 );
@@ -58,7 +61,6 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/courses", adminCourseRoutes);
 
-
 app.use("/api/attachments", attachmentRoutes);
 app.use("/uploads", express.static("uploads"));
 
@@ -69,8 +71,10 @@ try {
     await Database();
     console.log("✅ MongoDB connected successfully");
 
-    app.listen(5200, () => {
-        console.log("✅ Server running on http://localhost:5200");
+    const PORT = process.env.PORT || 5200;
+
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on port ${PORT}`);
     });
 } catch (error) {
     console.error("❌ Failed to connect to MongoDB:", error.message);
