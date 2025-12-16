@@ -30,12 +30,7 @@ const app = express();
 ====================== */
 app.use(
     cors({
-        origin: [
-            "http://localhost:3000",
-            "http://localhost:5174",
-            "https://YOUR-FRONTEND.vercel.app"
-        ],
-
+        origin: ["http://localhost:3000", "http://localhost:5174"],
         credentials: true,
     })
 );
@@ -74,14 +69,10 @@ try {
     await Database();
     console.log("✅ MongoDB connected successfully");
 
-    if (process.env.VERCEL !== "1") {
-        app.listen(5200, () => {
-            console.log("✅ Server running on http://localhost:5200");
-        });
-    }
-
+    app.listen(5200, () => {
+        console.log("✅ Server running on http://localhost:5200");
+    });
 } catch (error) {
     console.error("❌ Failed to connect to MongoDB:", error.message);
     process.exit(1);
 }
-export default app;
