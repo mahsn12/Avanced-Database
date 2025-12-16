@@ -30,7 +30,12 @@ const app = express();
 ====================== */
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:5174"],
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:5174",
+            "https://YOUR-FRONTEND.vercel.app"
+        ],
+
         credentials: true,
     })
 );
