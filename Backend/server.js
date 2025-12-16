@@ -31,12 +31,16 @@ app.use(
         origin: [
             "http://localhost:3000",
             "http://localhost:5174",
-            // add your Vercel frontend URL later
-            // "https://your-frontend.vercel.app"
+            "https://asu-community-iyle.vercel.app" // ✅ YOUR VERCEL FRONTEND
         ],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
     })
 );
+
+// ✅ HANDLE PREFLIGHT REQUESTS (THIS FIXES THE ERROR)
+app.options("*", cors());
 
 // BODY PARSER
 app.use(express.json({ limit: "10mb" }));
