@@ -28,16 +28,16 @@ const app = express();
 ====================== */
 app.use(
     cors({
-        origin: [
-            "http://localhost:3000",
-            "http://localhost:5174",
-            "https://asu-community-iyle-git-main-elshahedasus-projects.vercel.app"
-        ],
+        origin: true, // ✅ allow whatever origin is requesting
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
     })
 );
+
+// handle preflight requests
+app.options("*", cors());
+
 
 // ✅ HANDLE PREFLIGHT REQUESTS
 app.options("*", cors());
