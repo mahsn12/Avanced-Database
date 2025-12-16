@@ -1,52 +1,52 @@
 import Report from "../Models/Report.js";
-import ActivityLog from "../Models/ActivityLog.js";
 
-/* ======================================================
+/* =========================
    CREATE REPORT
-====================================================== */
-export const createReport = async (req, res) => {
-  try {
-    const { reporterId, targetId, targetType, reason } = req.body;
+========================= */
+export const createReport = async(req, res) => {
+    try {
+        const report = await Report.create({
+            _id: `RP-${Date.now()}`,
+            reporterId: req.body.reporterId,
+            targetId: req.body.targetId,
+            targetType: req.body.targetType,
+            reason: req.body.reason,
+            status: "pending",
+        });
 
-    if (!reporterId || !targetId || !targetType || !reason) {
-      return res.status(400).json({ message: "Missing required fields" });
+        res.status(201).json(report);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-
-    const report = await Report.create({
-      _id: `RP-${Date.now()}`,
-      reporterId,
-      targetId,
-      targetType,
-      reason,
-      status: "pending",
-    });
-
-    await ActivityLog.create({
-      _id: `AL-${Date.now()}`,
-      userID: reporterId,
-      actionType: "CREATE_REPORT",
-      targetID: report._id,
-      detail: "User reported content",
-    });
-
-    res.status(201).json(report);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
 };
 
-/* ======================================================
-   GET REPORTED REPLIES (INSTRUCTOR)
-====================================================== */
-export const getReportedReplies = async (req, res) => {
-  try {
-    const reports = await Report.find({
-      targetType: "reply",
-      status: "pending",
-    });
+/* =========================
+   GET REPORTED REPLIES
+========================= */
+export const getReportedReplies = async(req, res) => {
+    try {
+        const reports = await Report.find({ targetType: "reply" });
+        res.json(reports);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
 
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+/* =========================
+   RESOLVE REPORT (ADMIN)
+========================= */
+export const resolveReport = async(req, res) => {
+    try {
+        const report = await Report.findByIdAndUpdate(
+            req.params.reportId, { status: "resolved" }, { new: true }
+        );
+
+        if (!report) {
+            return res.status(404).json({ message: "Report not found" });
+        }
+
+        res.json(report);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };

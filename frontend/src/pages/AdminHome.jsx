@@ -59,9 +59,16 @@ const AdminHome = () => {
      USER ACTIONS
   ====================== */
   const toggleUserStatus = async (id, status) => {
-    await API.patch(`/api/admin/users/${id}/status`, {
-      status: status === "active" ? "inactive" : "active",
-    });
+    const resolveReport = async (id) => {
+  await API.patch(`/api/reports/${id}/resolve`);
+
+  setReports(prev =>
+    prev.map(r =>
+      r._id === id ? { ...r, status: "resolved" } : r
+    )
+  );
+};
+
 
     setUsers(prev =>
       prev.map(u =>
@@ -163,15 +170,16 @@ const AdminHome = () => {
   /* ======================
      REPORT ACTIONS
   ====================== */
-  const resolveReport = async (id) => {
-    await API.patch(`/api/reports/${id}`, { status: "resolved" });
+const resolveReport = async (id) => {
+  await API.patch(`/api/reports/${id}/resolve`);
 
-    setReports(prev =>
-      prev.map(r =>
-        r._id === id ? { ...r, status: "resolved" } : r
-      )
-    );
-  };
+  setReports(prev =>
+    prev.map(r =>
+      r._id === id ? { ...r, status: "resolved" } : r
+    )
+  );
+};
+
 
   return (
     <>

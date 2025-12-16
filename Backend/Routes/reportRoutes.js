@@ -2,6 +2,7 @@ import express from "express";
 import {
     createReport,
     getReportedReplies,
+    resolveReport, // ✅ ADD
 } from "../Controllers/report.js";
 
 import Report from "../Models/Report.js";
@@ -9,7 +10,7 @@ import Report from "../Models/Report.js";
 const router = express.Router();
 
 /* =========================
-   ADMIN (ADDED — NO CHANGES)
+   ADMIN ROUTES
 ========================= */
 
 // ✅ GET ALL REPORTS (Admin dashboard)
@@ -22,10 +23,14 @@ router.get("/", async(req, res) => {
     }
 });
 
+// ✅ RESOLVE REPORT (ADMIN)
+router.patch("/:reportId/resolve", resolveReport);
+
 /* =========================
-   EXISTING ROUTES
+   EXISTING ROUTES (UNCHANGED)
 ========================= */
 
+// Create report (student)
 router.post("/", createReport);
 
 // Used by instructor moderation
