@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import InstructorNavbar from "../components/InstructorNavbar";
 
 const InstructorHome = () => {
   const navigate = useNavigate();
@@ -27,7 +27,8 @@ const InstructorHome = () => {
 
   return (
     <>
-      <Navbar />
+      {/* ✅ INSTRUCTOR NAVBAR */}
+      <InstructorNavbar />
 
       <div className="instructor-page">
         <h2 className="instructor-title">Instructor Dashboard</h2>
@@ -36,54 +37,58 @@ const InstructorHome = () => {
             COURSES
         ====================== */}
         <div className="instructor-course-grid">
-          {courses.map(course => (
-            <div key={course._id} className="instructor-course-card">
-              <div className="course-info">
-                <h3>{course.title}</h3>
-                <p className="course-code">Course Code: {course.code}</p>
+          {courses.length === 0 ? (
+            <p className="empty-text">No assigned courses.</p>
+          ) : (
+            courses.map(course => (
+              <div key={course._id} className="instructor-course-card">
+                <div className="course-info">
+                  <h3>{course.title}</h3>
+                  <p className="course-code">Course Code: {course.code}</p>
+                </div>
+
+                <div className="course-actions">
+                  <button
+                    className="btn primary"
+                    onClick={() =>
+                      navigate("/instructor/create-thread", {
+                        state: { courseId: course._id },
+                      })
+                    }
+                  >
+                    Create Thread
+                  </button>
+
+                  <button
+                    className="btn success"
+                    onClick={() => navigate(`/threads/${course._id}`)}
+                  >
+                    View Threads
+                  </button>
+
+                  <button
+                    className="btn warning"
+                    onClick={() =>
+                      navigate("/announcements", {
+                        state: { courseId: course._id },
+                      })
+                    }
+                  >
+                    Post Announcement
+                  </button>
+
+                  <button
+                    className="btn danger"
+                    onClick={() =>
+                      navigate(`/questions/course/${course._id}`)
+                    }
+                  >
+                    Answer Questions
+                  </button>
+                </div>
               </div>
-
-              <div className="course-actions">
-                <button
-                  className="btn primary"
-                  onClick={() =>
-                    navigate("/instructor/create-thread", {
-                      state: { courseId: course._id },
-                    })
-                  }
-                >
-                  Create Thread
-                </button>
-
-                <button
-                  className="btn success"
-                  onClick={() => navigate(`/threads/${course._id}`)}
-                >
-                  View Threads
-                </button>
-
-                <button
-                  className="btn warning"
-                  onClick={() =>
-                    navigate("/announcements", {
-                      state: { courseId: course._id },
-                    })
-                  }
-                >
-                  Post Announcement
-                </button>
-
-                <button
-                  className="btn danger"
-                  onClick={() =>
-                    navigate(`/questions/course/${course._id}`)
-                  }
-                >
-                  Answer Questions
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* ======================
