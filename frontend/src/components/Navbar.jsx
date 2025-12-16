@@ -48,7 +48,7 @@ const Navbar = () => {
             {unread > 0 && <span className="badge">{unread}</span>}
           </Link>
 
-          <Link to="/profile" className="nav-link">Profile</Link>
+          
 
           <button className="logout-btn" onClick={handleLogout}>
             Logout

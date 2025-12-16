@@ -1,18 +1,26 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+/* AUTH */
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+/* STUDENT */
 import Home from "./pages/Home";
 import Threads from "./pages/Threads";
 import Questions from "./pages/Questions";
 
+/* INSTRUCTOR */
 import InstructorHome from "./pages/InstructorHome";
 import CreateThread from "./pages/CreateThread";
 import InstructorQuestions from "./pages/InstructorQuestions";
 
+/* SHARED */
 import Announcements from "./pages/Announcements";
 import Reports from "./pages/Reports";
-import AdminHome from "./pages/AdminHome"; // ✅ ADMIN PAGE
+import Notifications from "./pages/Notifications";
+
+/* ADMIN */
+import AdminHome from "./pages/AdminHome";
 
 function App() {
     return ( <
@@ -35,16 +43,18 @@ function App() {
         />
 
         { /* ================= THREADS & QUESTIONS ================= */ } <
-        Route path = "/threads/:courseId"
-        element = { < Threads / > }
-        /> <
         Route path = "/threads"
         element = { < Threads / > }
         /> <
-        Route path = "/questions/:threadId"
+        Route path = "/threads/:courseId"
+        element = { < Threads / > }
+        />
+
+        <
+        Route path = "/questions"
         element = { < Questions / > }
         /> <
-        Route path = "/questions"
+        Route path = "/questions/:threadId"
         element = { < Questions / > }
         />
 
@@ -69,7 +79,10 @@ function App() {
         element = { < Reports / > }
         />
 
-        { /* ================= ADMIN ================= */ } <
+        { /* ================= NOTIFICATIONS ================= */ } <
+        Route path = "/notifications"
+        element = { < Notifications / > }
+        /> { /* ================= ADMIN ================= */ } <
         Route path = "/admin/dashboard"
         element = { < AdminHome / > }
         />
